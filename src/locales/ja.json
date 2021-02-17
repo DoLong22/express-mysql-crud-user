@@ -1,0 +1,5 @@
+{
+	"auth.login.wrongEmailOrPassword": "Incorrect email or password.",
+	"auth.login.oldPasswordIsNotCorrect": "The old password is incorrect.",
+	"auth.login.notAUser": "User does not exist"
+}
