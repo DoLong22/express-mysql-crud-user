@@ -1,6 +1,6 @@
 import { authenticate, REFRESH_TYPE } from '../../middleware/auth';
 import {
-    login, getProfile, updateProfile, changePassword, refreshToken,
+    register, login, getProfile, updateProfile, changePassword, refreshToken,
 } from './authController';
 import {
     loginValidator, profileValidator, passwordValidator,
@@ -10,7 +10,8 @@ const express = require('express');
 
 module.exports = (app) => {
     const router = express.Router();
-    router.post('/login', loginValidator, login);
+    router.post('/register', register);
+    router.post('/login', login);
     router.post('/refresh-token', authenticate(REFRESH_TYPE), refreshToken);
     router.get('/profile', authenticate(), getProfile);
     router.post('/profile', authenticate(), profileValidator, updateProfile);

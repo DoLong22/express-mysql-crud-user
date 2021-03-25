@@ -16,5 +16,5 @@ module.exports = (app) => {
     router.patch('/:id', authenticate(), updateValidator, update);
     router.patch('/:id/password', authenticate(), updatePasswordValidator, updatePassword);
     router.delete('/:id', authenticate(), deleteUser);
-    app.use('/api/user', router);
+    app.use('/api/users', router);
 };

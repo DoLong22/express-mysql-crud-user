@@ -1,4 +1,5 @@
 import i18n from 'i18n';
+import { mode } from 'crypto-js';
 import { ErrorCodes } from '../../helpers/constants';
 import {
     hashPassword, isValidPassword, saveToken, checkIfTokenExist, destroyToken, signToken, userAuthInfo,
@@ -7,6 +8,27 @@ import { getUserDetail } from '../users/userService';
 import { respondWithError, logSystemError, respondSuccess } from '../../helpers/messageResponse';
 
 const models = require('../../models');
+
+export async function register(req, res) {
+    try {
+        const { email, password } = req.body;
+        let user = await models.User.findOne({
+            where: {
+                email,
+            },
+        });
+        if (user) {
+            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('Email exist'), {}));
+        }
+        const savePass = hashPassword(password);
+        user = await models.User.create({ email, password: savePass });
+        const { token, rToken } = await signToken(user);
+        await saveToken(user, rToken);
+        return res.json(respondSuccess(userAuthInfo(user, token, rToken)));
+    } catch (error) {
+        return logSystemError(res, error, 'authController - register');
+    }
+}
 
 export async function login(req, res) {
     try {
