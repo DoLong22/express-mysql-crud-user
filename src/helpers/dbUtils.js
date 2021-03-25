@@ -22,8 +22,6 @@ export async function checkUniqueValue(model, query = {}) {
         });
         return !value;
     } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log('checkUniqueValue ', e);
         return false;
     }
 }

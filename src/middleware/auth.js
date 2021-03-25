@@ -30,6 +30,7 @@ export function authenticate(type = 'token') {
 
             // Token valid, set user to request
             req.loginUser = user;
+            if (isRefresh) req.refreshToken = token;
             return next();
         } catch (e) {
             logger.error(`Func: authenticate ; error in authenticate: ${e.message}`);
