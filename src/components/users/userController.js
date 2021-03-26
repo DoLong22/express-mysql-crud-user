@@ -50,8 +50,9 @@ export async function getDetail(req, res) {
 export async function update(req, res) {
     try {
         const {
-            fullName, gender, email, phone, birthday, password,
+            fullName, gender, email, phone, birthday,
         } = req.body;
+        const password = hashPassword(req.body.password);
         const user = await models.User.update({
             fullName, gender, email, phone, birthday, password,
         }, {
@@ -67,7 +68,15 @@ export async function update(req, res) {
 
 export async function updatePassword(req, res) {
     try {
-        return res.json(respondSuccess());
+        const newPassword = hashPassword(req.body.password);
+        const user = await models.User.update({
+            password: newPassword,
+        }, {
+            where: {
+                id: req.params.id,
+            },
+        });
+        return res.json(respondSuccess(user));
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
     }
