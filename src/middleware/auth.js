@@ -20,7 +20,6 @@ export function authenticate(type = 'token') {
     return (req, res, next) => {
         try {
             const token = extractToken(req.headers.authorization || '');
-            console.log(token);
             const user = isRefresh
                 ? (jwt.verify(token, SECRET_REFRESH_ACCESS_TOKEN))
                 : (jwt.verify(token, SECRET_ACCESS_TOKEN));

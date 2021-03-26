@@ -21,3 +21,15 @@ export async function getUserDetail(id) {
         throw e;
     }
 }
+export async function findUserByEmail(email) {
+    try {
+        return await models.User.findOne({
+            where: {
+                email,
+            },
+        });
+    } catch (e) {
+        logger.error(`Error in find user ${e.message}`);
+        throw e;
+    }
+}

@@ -6,6 +6,9 @@ import {
     logSystemError,
 } from '../../helpers/messageResponse';
 
+import { hashPassword } from '../auth/authService';
+import { getUserDetail, findUserByEmail } from './userService';
+
 const models = require('../../models');
 
 export async function getList(req, res) {
@@ -21,10 +24,15 @@ export async function getList(req, res) {
 export async function create(req, res) {
     try {
         const {
-            fullName, birthday, phone, gender,
+            fullName, birthday, phone, gender, email,
         } = req.body;
+        const password = hashPassword(req.body.password);
+        const user = await findUserByEmail(email);
+        if (user) {
+            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('Email exist'), {}));
+        }
         await models.User.create({
-            fullName, birthday, phone, gender,
+            fullName, birthday, phone, gender, email, password,
         });
         return res.json(respondSuccess({}));
     } catch (error) {
@@ -33,7 +41,10 @@ export async function create(req, res) {
 }
 export async function getDetail(req, res) {
     try {
-        return res.json(respondSuccess({}));
+        const user = await getUserDetail(req.params.id);
+        console.log(user);
+        console.log(req.params.id);
+        return res.json(respondSuccess(user));
     } catch (error) {
         return logSystemError(res, error, 'userController - getDetail');
     }

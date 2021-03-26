@@ -10,6 +10,8 @@ const userFormSchema = {
 };
 
 const createValidSchema = Joi.object().keys({
+    email: Joi.string().email(),
+    password: Joi.string().min(8),
     fullName: Joi.string().required(),
     birthday: Joi.date().required(),
     phone: Joi.string().max(11).min(10),
