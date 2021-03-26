@@ -1,5 +1,4 @@
 import i18n from 'i18n';
-import { mode } from 'crypto-js';
 import { ErrorCodes } from '../../helpers/constants';
 import {
     hashPassword, isValidPassword, saveToken, checkIfTokenExist, destroyToken, signToken, userAuthInfo,

@@ -10,6 +10,10 @@ const userFormSchema = {
 };
 
 const createValidSchema = Joi.object().keys({
+    fullName: Joi.string().required(),
+    birthday: Joi.date().required(),
+    phone: Joi.string().max(11).min(10),
+    gender: Joi.any(),
 });
 
 const updateValidSchema = Joi.object().keys(userFormSchema);
