@@ -10,10 +10,10 @@ const userFormSchema = {
 };
 
 const createValidSchema = Joi.object().keys({
-    email: Joi.string().email(),
-    password: Joi.string().min(8),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
     fullName: Joi.string().required(),
-    birthday: Joi.date().required(),
+    birthday: Joi.date(),
     phone: Joi.string().max(11).min(10),
     gender: Joi.any(),
 });

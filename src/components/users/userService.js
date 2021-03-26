@@ -6,7 +6,7 @@ const { Op } = Sequelize;
 
 const models = require('../../models');
 
-const userAttributes = ['id', 'email'];
+const userAttributes = ['id', 'email', 'fullName', 'gender', 'birthday', 'phone'];
 
 // get user detail
 export async function getUserDetail(id) {
