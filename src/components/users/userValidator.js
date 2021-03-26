@@ -7,6 +7,12 @@ const Extension = require('@hapi/joi-date');
 const Joi = BaseJoi.extend(Extension);
 
 const userFormSchema = {
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8),
+    fullName: Joi.string().required(),
+    birthday: Joi.date(),
+    phone: Joi.string().max(11).min(10),
+    gender: Joi.any(),
 };
 
 const createValidSchema = Joi.object().keys({

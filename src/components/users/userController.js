@@ -42,8 +42,6 @@ export async function create(req, res) {
 export async function getDetail(req, res) {
     try {
         const user = await getUserDetail(req.params.id);
-        console.log(user);
-        console.log(req.params.id);
         return res.json(respondSuccess(user));
     } catch (error) {
         return logSystemError(res, error, 'userController - getDetail');
@@ -51,7 +49,17 @@ export async function getDetail(req, res) {
 }
 export async function update(req, res) {
     try {
-        return res.json(respondSuccess());
+        const {
+            fullName, gender, email, phone, birthday, password,
+        } = req.body;
+        const user = await models.User.update({
+            fullName, gender, email, phone, birthday, password,
+        }, {
+            where: {
+                id: req.params.id,
+            },
+        });
+        return res.json(respondSuccess(user));
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
     }
