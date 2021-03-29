@@ -84,7 +84,9 @@ export async function updatePassword(req, res) {
 
 export async function deleteUser(req, res) {
     try {
-        return res.json(respondSuccess());
+        const { id } = req.params;
+        const isDelete = await models.User.destroy({ where: { id } });
+        return res.json(respondSuccess(isDelete));
     } catch (error) {
         return logSystemError(res, error, 'userController - deleteUser');
     }
