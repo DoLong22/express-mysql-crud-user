@@ -67,6 +67,8 @@ export async function updatePasswordValidator(req, res, next) {
 }
 
 const getUserListValidSchema = Joi.object().keys({
+    page: Joi.number().integer(),
+    limit: Joi.number().integer(),
 });
 
 export async function getUserListValidator(req, res, next) {

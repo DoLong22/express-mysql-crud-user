@@ -13,8 +13,13 @@ const models = require('../../models');
 
 export async function getList(req, res) {
     try {
+        const { page, limit = 10 } = req.query;
+        const users = await models.User.findAll({
+            limit,
+            offset: page * limit,
+        });
         return res.json(
-            respondSuccess({ items: [], totalItems: 0 }),
+            respondSuccess({ items: users, totalItems: limit }),
         );
     } catch (error) {
         return logSystemError(res, error, 'userController - getList');
