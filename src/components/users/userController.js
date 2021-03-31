@@ -13,7 +13,7 @@ const models = require('../../models');
 
 export async function getList(req, res) {
     try {
-        const { page, limit = 10 } = req.query;
+        const { page, limit = 5 } = req.query;
         const users = await models.User.findAll({
             limit,
             offset: page * limit,

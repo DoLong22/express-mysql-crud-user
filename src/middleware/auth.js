@@ -25,7 +25,8 @@ export function authenticate(type = 'token') {
                 : (jwt.verify(token, SECRET_ACCESS_TOKEN));
             // Token is invalid
             if (!user.id) {
-                return res.json(respondWithError(ErrorCodes.ERROR_CODE_UNAUTHORIZED, 'ERROR_CODE_UNAUTHORIZED'));
+                return res.status(ErrorCodes.ERROR_CODE_UNAUTHORIZED)
+                    .json(respondWithError(ErrorCodes.ERROR_CODE_UNAUTHORIZED, 'ERROR_CODE_UNAUTHORIZED'));
             }
 
             // Token valid, set user to request
@@ -34,7 +35,8 @@ export function authenticate(type = 'token') {
             return next();
         } catch (e) {
             logger.error(`Func: authenticate ; error in authenticate: ${e.message}`);
-            return res.json(respondWithError(ErrorCodes.ERROR_CODE_UNAUTHORIZED, 'ERROR_CODE_UNAUTHORIZED'));
+            return res.status(ErrorCodes.ERROR_CODE_UNAUTHORIZED)
+                .json(respondWithError(ErrorCodes.ERROR_CODE_UNAUTHORIZED, 'ERROR_CODE_UNAUTHORIZED'));
         }
     };
 }
