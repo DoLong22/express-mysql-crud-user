@@ -13,16 +13,16 @@ const models = require('../../models');
 
 export async function getList(req, res) {
     try {
-        const { page, limit = 5 } = req.query;
+        const { page, limit } = req.query;
         const users = await models.User.findAll({
-            limit,
+            limit: +limit,
             offset: page * limit,
         });
         return res.json(
-            respondSuccess({ items: users, totalItems: limit }),
+            respondSuccess({ users, totalItems: limit }),
         );
     } catch (error) {
-        return logSystemError(res, error, 'userController - getList');
+        return res.json(logSystemError(res, error, 'userController - getList'));
     }
 }
 
@@ -57,9 +57,10 @@ export async function update(req, res) {
         const {
             fullName, gender, email, phone, birthday,
         } = req.body;
-        const password = hashPassword(req.body.password);
+        console.log(req.params.id);
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaa')
         const user = await models.User.update({
-            fullName, gender, email, phone, birthday, password,
+            fullName, gender, email, phone, birthday,
         }, {
             where: {
                 id: req.params.id,

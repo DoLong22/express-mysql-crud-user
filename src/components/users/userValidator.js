@@ -9,18 +9,18 @@ const Joi = BaseJoi.extend(Extension);
 const userFormSchema = {
     email: Joi.string().email().required(),
     password: Joi.string().min(8),
-    fullName: Joi.string().required(),
-    birthday: Joi.date(),
-    phone: Joi.string().max(11).min(10),
+    fullName: Joi.string().allow(null),
+    birthday: Joi.date().allow(null),
+    phone: Joi.string().max(11).min(10).allow(null),
     gender: Joi.any(),
 };
 
 const createValidSchema = Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
-    fullName: Joi.string().required(),
-    birthday: Joi.date(),
-    phone: Joi.string().max(11).min(10),
+    fullName: Joi.string().allow(null),
+    birthday: Joi.date().allow(null),
+    phone: Joi.string().max(11).min(10).allow(null),
     gender: Joi.any(),
 });
 
@@ -28,11 +28,10 @@ const updateValidSchema = Joi.object().keys(userFormSchema);
 
 export async function createValidator(req, res, next) {
     const { body } = req;
-
     const result = Joi.validate(body, createValidSchema);
-
     if (result.error) {
-        res.json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
+        res.status(ErrorCodes.ERROR_CODE_INVALID_PARAMETER)
+            .json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
         return;
     }
     next();
@@ -40,11 +39,13 @@ export async function createValidator(req, res, next) {
 
 export async function updateValidator(req, res, next) {
     const { body } = req;
-
+    console.log(body.birthday);
     const result = Joi.validate(body, updateValidSchema);
-
+    console.log(result);
     if (result.error) {
-        res.json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
+        console.log('errorrrrrrrrr');
+        res.status(ErrorCodes.ERROR_CODE_INVALID_PARAMETER)
+            .json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
         return;
     }
     next();
@@ -73,9 +74,7 @@ const getUserListValidSchema = Joi.object().keys({
 
 export async function getUserListValidator(req, res, next) {
     const { query } = req;
-
     const result = Joi.validate(query, getUserListValidSchema);
-
     if (result.error) {
         res.json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
         return;

@@ -10,7 +10,7 @@
   "auth": {
     "secret_access_token": "edit this",
     "secret_refresh_access_token": "edit this",
-    "secret_access_token_expire": 300,
+    "secret_access_token_expire": 30,
     "secret_refresh_access_token_expire": 86400,
     "secret_crypto_password": "crypto_password"
   }
