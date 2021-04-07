@@ -35,3 +35,7 @@ TZ='Etc/UTC'
 * `database` folder contains migrations, seeders
 * `config` folder contains config files, refer to https://github.com/lorenwest/node-config/wiki/Configuration-Files
 * `logs` folder contains access log to server
+
+#### Postman API
+* https://www.getpostman.com/collections/6e9c3e60d58f72424cae
+
