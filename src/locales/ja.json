@@ -1,7 +1,6 @@
 {
-	"auth.login.wrongEmailOrPassword": "Incorrect email or password.",
-	"auth.login.oldPasswordIsNotCorrect": "The old password is incorrect.",
-	"auth.login.notAUser": "User does not exist",
-	"auth.login.emailExist": "auth.login.emailExist",
-	"Email exist": "Email exist"
+    "auth.login.wrongEmailOrPassword": "Incorrect email or password.",
+    "auth.login.oldPasswordIsNotCorrect": "The old password is incorrect.",
+    "auth.login.notAUser": "User does not exist",
+    "auth.login.emailExist": "Email exist"
 }

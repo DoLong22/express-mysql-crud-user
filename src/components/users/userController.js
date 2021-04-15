@@ -29,15 +29,15 @@ export async function getList(req, res) {
 export async function create(req, res) {
     try {
         const {
-            fullName, birthday, phone, gender, email,
+            fullName, birthday, phone, gender, email, password,
         } = req.body;
-        const password = hashPassword(req.body.password);
+
         const user = await findUserByEmail(email);
         if (user) {
-            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('Email exist'), {}));
+            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('auth.login.emailExist'), {}));
         }
         await models.User.create({
-            fullName, birthday, phone, gender, email, password,
+            fullName, birthday, phone, gender, email, password: hashPassword(password), createdBy: req.loginUser.id,
         });
         return res.json(respondSuccess({}));
     } catch (error) {
@@ -55,18 +55,16 @@ export async function getDetail(req, res) {
 export async function update(req, res) {
     try {
         const {
-            fullName, gender, email, phone, birthday,
+            fullName, gender, phone, birthday,
         } = req.body;
-        console.log(req.params.id);
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaa')
-        const user = await models.User.update({
-            fullName, gender, email, phone, birthday,
+        await models.User.update({
+            fullName, gender, phone, birthday,
         }, {
             where: {
                 id: req.params.id,
             },
         });
-        return res.json(respondSuccess(user));
+        return res.json(respondSuccess());
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
     }
@@ -90,8 +88,7 @@ export async function updatePassword(req, res) {
 
 export async function deleteUser(req, res) {
     try {
-        const { id } = req.params;
-        const isDelete = await models.User.destroy({ where: { id } });
+        const isDelete = await models.User.destroy({ where: { id: req.params.id } });
         return res.json(respondSuccess(isDelete));
     } catch (error) {
         return logSystemError(res, error, 'userController - deleteUser');

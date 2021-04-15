@@ -17,7 +17,7 @@ export async function register(req, res) {
             },
         });
         if (user) {
-            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('Email exist'), {}));
+            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('auth.login.emailExist'), {}));
         }
         const savePass = hashPassword(password);
         user = await models.User.create({ email, password: savePass });

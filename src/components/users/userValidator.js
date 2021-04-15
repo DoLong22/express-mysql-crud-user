@@ -1,5 +1,6 @@
 import { respondWithError } from '../../helpers/messageResponse';
 import { ErrorCodes } from '../../helpers/constants';
+import { Genders } from './userConstant';
 
 const BaseJoi = require('@hapi/joi');
 const Extension = require('@hapi/joi-date');
@@ -7,21 +8,19 @@ const Extension = require('@hapi/joi-date');
 const Joi = BaseJoi.extend(Extension);
 
 const userFormSchema = {
-    email: Joi.string().email().required(),
-    password: Joi.string().min(8),
-    fullName: Joi.string().allow(null),
-    birthday: Joi.date().allow(null),
-    phone: Joi.string().max(11).min(10).allow(null),
-    gender: Joi.any(),
+    fullName: Joi.string().max(255).required(),
+    birthday: Joi.date().less('now').min('1900-01-01').format('YYYY-MM-DD')
+        .allow(null)
+        .optional(),
+    phone: Joi.string().regex(/^(09|01[2|6|8|9])+([0-9]{7,8})\b$/).max(20).allow(null)
+        .optional(),
+    gender: Joi.string().valid(Genders.MALE, Genders.FEMALE, Genders.OTHER).allow(null).optional(),
 };
 
 const createValidSchema = Joi.object().keys({
-    email: Joi.string().email().required(),
+    email: Joi.string().regex(/\S+@\S+\.\S+/).required(),
     password: Joi.string().min(8).required(),
-    fullName: Joi.string().allow(null),
-    birthday: Joi.date().allow(null),
-    phone: Joi.string().max(11).min(10).allow(null),
-    gender: Joi.any(),
+    ...userFormSchema,
 });
 
 const updateValidSchema = Joi.object().keys(userFormSchema);
@@ -30,6 +29,7 @@ export async function createValidator(req, res, next) {
     const { body } = req;
     const result = Joi.validate(body, createValidSchema);
     if (result.error) {
+        console.log(result.error);
         res.status(ErrorCodes.ERROR_CODE_INVALID_PARAMETER)
             .json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
         return;
@@ -39,11 +39,9 @@ export async function createValidator(req, res, next) {
 
 export async function updateValidator(req, res, next) {
     const { body } = req;
-    console.log(body.birthday);
     const result = Joi.validate(body, updateValidSchema);
-    console.log(result);
     if (result.error) {
-        console.log('errorrrrrrrrr');
+        console.log(result.error);
         res.status(ErrorCodes.ERROR_CODE_INVALID_PARAMETER)
             .json(respondWithError(ErrorCodes.ERROR_CODE_INVALID_PARAMETER, result.error.message, result.error.details));
         return;
