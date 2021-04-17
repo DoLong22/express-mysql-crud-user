@@ -28,8 +28,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER(10).UNSIGNED,
             allowNull: true,
         },
+        deletedAt: {
+            type: DataTypes.DATE,
+        },
     }, {
         tableName: 'users',
+        paranoid: true,
+        timestamps: true,
     });
     User.associate = function (models) {
     };

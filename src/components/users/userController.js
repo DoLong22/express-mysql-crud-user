@@ -6,40 +6,40 @@ import {
     logSystemError,
 } from '../../helpers/messageResponse';
 
-import { hashPassword } from '../auth/authService';
-import { getUserDetail, findUserByEmail } from './userService';
+import {
+    getUsers,
+    getUserDetail,
+    updateUser,
+    createUser,
+    deleteUserSv,
+} from './userService';
 
-const models = require('../../models');
-
-export async function getList(req, res) {
+export async function getListUser(req, res) {
     try {
-        const { page, limit } = req.query;
-        const users = await models.User.findAll({
-            limit: +limit,
-            offset: page * limit,
-        });
-        return res.json(
-            respondSuccess({ users, totalItems: limit }),
-        );
+        const users = await getUsers(req.query);
+        return res.json(respondSuccess(users));
     } catch (error) {
-        return res.json(logSystemError(res, error, 'userController - getList'));
+        return res.json(
+            logSystemError(res, error, 'userController - getListUser'),
+        );
     }
 }
 
 export async function create(req, res) {
     try {
-        const {
-            fullName, birthday, phone, gender, email, password,
-        } = req.body;
-
-        const user = await findUserByEmail(email);
-        if (user) {
-            return res.json(respondWithError(ErrorCodes.ERROR_CODE_EMAIL_EXIST, i18n.__('auth.login.emailExist'), {}));
-        }
-        await models.User.create({
-            fullName, birthday, phone, gender, email, password: hashPassword(password), createdBy: req.loginUser.id,
+        const user = await createUser({
+            payload: req.body,
+            createdBy: req.loginUser,
         });
-        return res.json(respondSuccess({}));
+        if (!user) {
+            return res.json(
+                respondWithError(
+                    ErrorCodes.ERROR_CODE_EMAIL_EXIST,
+                    i18n.__('auth.login.emailExist'),
+                ),
+            );
+        }
+        return res.json(respondSuccess(user));
     } catch (error) {
         return logSystemError(res, error, 'userController - create');
     }
@@ -47,6 +47,14 @@ export async function create(req, res) {
 export async function getDetail(req, res) {
     try {
         const user = await getUserDetail(req.params.id);
+        if (!user) {
+            return res.json(
+                respondWithError(
+                    ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
+                    i18n.__('user.notFound'),
+                ),
+            );
+        }
         return res.json(respondSuccess(user));
     } catch (error) {
         return logSystemError(res, error, 'userController - getDetail');
@@ -54,16 +62,19 @@ export async function getDetail(req, res) {
 }
 export async function update(req, res) {
     try {
-        const {
-            fullName, gender, phone, birthday,
-        } = req.body;
-        await models.User.update({
-            fullName, gender, phone, birthday,
-        }, {
-            where: {
-                id: req.params.id,
-            },
+        const isUpdate = await updateUser({
+            payload: req.body,
+            idUser: req.params.id,
+            updatedBy: req.loginUser,
         });
+        if (!isUpdate) {
+            return res.json(
+                respondWithError(
+                    ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
+                    i18n.__('user.notFound'),
+                ),
+            );
+        }
         return res.json(respondSuccess());
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
@@ -72,15 +83,20 @@ export async function update(req, res) {
 
 export async function updatePassword(req, res) {
     try {
-        const newPassword = hashPassword(req.body.password);
-        const user = await models.User.update({
-            password: newPassword,
-        }, {
-            where: {
-                id: req.params.id,
-            },
+        const isUpdated = await updateUser({
+            payload: req.body,
+            idUser: req.params.id,
+            updateBy: req.loginUser,
         });
-        return res.json(respondSuccess(user));
+        if (!isUpdated) {
+            return res.json(
+                respondWithError(
+                    ErrorCodes.ERROR_CODE_EMAIL_EXIST,
+                    i18n.__('user.notFound'),
+                ),
+            );
+        }
+        return res.json(respondSuccess());
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
     }
@@ -88,7 +104,15 @@ export async function updatePassword(req, res) {
 
 export async function deleteUser(req, res) {
     try {
-        const isDelete = await models.User.destroy({ where: { id: req.params.id } });
+        const isDelete = await deleteUserSv(req.params.id);
+        if (!isDelete) {
+            return res.json(
+                respondWithError(
+                    ErrorCodes.ERROR_CODE_EMAIL_EXIST,
+                    i18n.__('user.notFound'),
+                ),
+            );
+        }
         return res.json(respondSuccess(isDelete));
     } catch (error) {
         return logSystemError(res, error, 'userController - deleteUser');
