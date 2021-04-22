@@ -32,12 +32,14 @@ export async function create(req, res) {
             createdBy: req.loginUser,
         });
         if (!user) {
-            return res.json(
-                respondWithError(
-                    ErrorCodes.ERROR_CODE_EMAIL_EXIST,
-                    i18n.__('auth.login.emailExist'),
-                ),
-            );
+            return res
+                .status(ErrorCodes.ERROR_CODE_EMAIL_EXIST)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_EMAIL_EXIST,
+                        i18n.__('auth.login.emailExist'),
+                    ),
+                );
         }
         return res.json(respondSuccess(user));
     } catch (error) {
@@ -48,12 +50,14 @@ export async function getDetail(req, res) {
     try {
         const user = await getUserDetail(req.params.id);
         if (!user) {
-            return res.json(
-                respondWithError(
-                    ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
-                    i18n.__('user.notFound'),
-                ),
-            );
+            return res
+                .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
+                        i18n.__('user.notFound'),
+                    ),
+                );
         }
         return res.json(respondSuccess(user));
     } catch (error) {
@@ -68,12 +72,14 @@ export async function update(req, res) {
             updatedBy: req.loginUser,
         });
         if (!isUpdate) {
-            return res.json(
-                respondWithError(
-                    ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
-                    i18n.__('user.notFound'),
-                ),
-            );
+            return res
+                .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
+                        i18n.__('user.notFound'),
+                    ),
+                );
         }
         return res.json(respondSuccess());
     } catch (error) {
@@ -89,12 +95,14 @@ export async function updatePassword(req, res) {
             updateBy: req.loginUser,
         });
         if (!isUpdated) {
-            return res.json(
-                respondWithError(
-                    ErrorCodes.ERROR_CODE_EMAIL_EXIST,
-                    i18n.__('user.notFound'),
-                ),
-            );
+            return res
+                .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
+                        i18n.__('user.notFound'),
+                    ),
+                );
         }
         return res.json(respondSuccess());
     } catch (error) {
@@ -106,12 +114,14 @@ export async function deleteUser(req, res) {
     try {
         const isDelete = await deleteUserSv(req.params.id);
         if (!isDelete) {
-            return res.json(
-                respondWithError(
-                    ErrorCodes.ERROR_CODE_EMAIL_EXIST,
-                    i18n.__('user.notFound'),
-                ),
-            );
+            return res
+                .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST,
+                        i18n.__('user.notFound'),
+                    ),
+                );
         }
         return res.json(respondSuccess(isDelete));
     } catch (error) {

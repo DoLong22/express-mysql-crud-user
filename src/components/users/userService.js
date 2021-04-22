@@ -10,6 +10,7 @@ const models = require('../../models');
 const userAttributes = [
     'id',
     'email',
+    'password',
     'fullName',
     'gender',
     'birthday',

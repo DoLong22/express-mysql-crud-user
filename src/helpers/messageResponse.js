@@ -25,5 +25,12 @@ export function logSystemError(res, error, functionName) {
     errorObj.stack = error.stack;
     errorObj.functionName = functionName;
     logger.error(`Error in ${functionName}: ${JSON.stringify(errorObj)}`);
-    return res.json(respondWithError(ErrorCodes.ERROR_CODE_SYSTEM_ERROR, `SYSTEM_ERROR: ${errorObj.id}`));
+    return res
+        .status(ErrorCodes.ERROR_CODE_SYSTEM_ERROR)
+        .json(
+            respondWithError(
+                ErrorCodes.ERROR_CODE_SYSTEM_ERROR,
+                `SYSTEM_ERROR: ${errorObj.id}`,
+            ),
+        );
 }

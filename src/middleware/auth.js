@@ -6,7 +6,9 @@ import { ErrorCodes } from '../helpers/constants';
 const jwt = require('jsonwebtoken');
 
 const SECRET_ACCESS_TOKEN = config.get('auth.secret_access_token');
-const SECRET_REFRESH_ACCESS_TOKEN = config.get('auth.secret_refresh_access_token');
+const SECRET_REFRESH_ACCESS_TOKEN = config.get(
+    'auth.secret_refresh_access_token',
+);
 
 function extractToken(authorization = '') {
     if (/^Bearer /.test(authorization)) {
@@ -21,12 +23,18 @@ export function authenticate(type = 'token') {
         try {
             const token = extractToken(req.headers.authorization || '');
             const user = isRefresh
-                ? (jwt.verify(token, SECRET_REFRESH_ACCESS_TOKEN))
-                : (jwt.verify(token, SECRET_ACCESS_TOKEN));
+                ? jwt.verify(token, SECRET_REFRESH_ACCESS_TOKEN)
+                : jwt.verify(token, SECRET_ACCESS_TOKEN);
             // Token is invalid
             if (!user.id) {
-                return res.status(ErrorCodes.ERROR_CODE_UNAUTHORIZED)
-                    .json(respondWithError(ErrorCodes.ERROR_CODE_UNAUTHORIZED, 'ERROR_CODE_UNAUTHORIZED'));
+                return res
+                    .status(ErrorCodes.ERROR_CODE_UNAUTHORIZED)
+                    .json(
+                        respondWithError(
+                            ErrorCodes.ERROR_CODE_UNAUTHORIZED,
+                            'ERROR_CODE_UNAUTHORIZED',
+                        ),
+                    );
             }
 
             // Token valid, set user to request
@@ -34,9 +42,17 @@ export function authenticate(type = 'token') {
             if (isRefresh) req.refreshToken = token;
             return next();
         } catch (e) {
-            logger.error(`Func: authenticate ; error in authenticate: ${e.message}`);
-            return res.status(ErrorCodes.ERROR_CODE_UNAUTHORIZED)
-                .json(respondWithError(ErrorCodes.ERROR_CODE_UNAUTHORIZED, 'ERROR_CODE_UNAUTHORIZED'));
+            logger.error(
+                `Func: authenticate ; error in authenticate: ${e.message}`,
+            );
+            return res
+                .status(ErrorCodes.ERROR_CODE_UNAUTHORIZED)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_UNAUTHORIZED,
+                        'ERROR_CODE_UNAUTHORIZED',
+                    ),
+                );
         }
     };
 }

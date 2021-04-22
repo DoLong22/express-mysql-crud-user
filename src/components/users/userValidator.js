@@ -40,6 +40,8 @@ const updateValidSchema = Joi.object().keys(userFormSchema);
 export async function createValidator(req, res, next) {
     const { body } = req;
     const result = Joi.validate(body, createValidSchema);
+    console.log(result.error);
+
     if (result.error) {
         console.log(result.error);
         res.status(ErrorCodes.ERROR_CODE_INVALID_PARAMETER).json(
