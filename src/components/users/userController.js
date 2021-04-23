@@ -11,8 +11,11 @@ import {
     getUserDetail,
     updateUser,
     createUser,
-    deleteUserSv,
+    deleteUserService,
+    findUserByEmail,
+    findUserByPk,
 } from './userService';
+import { hashPassword, isValidPassword } from '../auth/authService';
 
 export async function getListUser(req, res) {
     try {
@@ -27,11 +30,9 @@ export async function getListUser(req, res) {
 
 export async function create(req, res) {
     try {
-        const user = await createUser({
-            payload: req.body,
-            createdBy: req.loginUser,
-        });
-        if (!user) {
+        const user = req.body;
+        const userId = await findUserByEmail(user.email);
+        if (userId) {
             return res
                 .status(ErrorCodes.ERROR_CODE_EMAIL_EXIST)
                 .json(
@@ -41,7 +42,13 @@ export async function create(req, res) {
                     ),
                 );
         }
-        return res.json(respondSuccess(user));
+        const createdUser = await createUser({
+            ...user,
+            password: hashPassword(user.password),
+            createdBy: req.loginUser.id,
+            createdAt: new Date(),
+        });
+        return res.json(respondSuccess(createdUser));
     } catch (error) {
         return logSystemError(res, error, 'userController - create');
     }
@@ -66,12 +73,9 @@ export async function getDetail(req, res) {
 }
 export async function update(req, res) {
     try {
-        const isUpdate = await updateUser({
-            payload: req.body,
-            idUser: req.params.id,
-            updatedBy: req.loginUser,
-        });
-        if (!isUpdate) {
+        const user = req.body;
+        const userId = await findUserByPk(req.params.id);
+        if (!userId) {
             return res
                 .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
                 .json(
@@ -81,6 +85,10 @@ export async function update(req, res) {
                     ),
                 );
         }
+        await updateUser({
+            ...user,
+            updatedBy: req.loginUser.id,
+        }, req.params.id);
         return res.json(respondSuccess());
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
@@ -89,12 +97,9 @@ export async function update(req, res) {
 
 export async function updatePassword(req, res) {
     try {
-        const isUpdated = await updateUser({
-            payload: req.body,
-            idUser: req.params.id,
-            updateBy: req.loginUser,
-        });
-        if (!isUpdated) {
+        const { changePassword, oldPassword } = req.body;
+        const { id, password } = await findUserByPk(req.params.id);
+        if (!id) {
             return res
                 .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
                 .json(
@@ -104,6 +109,20 @@ export async function updatePassword(req, res) {
                     ),
                 );
         }
+        if (!isValidPassword(password, oldPassword)) {
+            return res
+                .status(ErrorCodes.ERROR_CODE_OLD_PASSWORD_NOT_CORRECT)
+                .json(
+                    respondWithError(
+                        ErrorCodes.ERROR_CODE_OLD_PASSWORD_NOT_CORRECT,
+                        i18n.__('auth.login.oldPasswordIsNotCorrect'),
+                    ),
+                );
+        }
+        await updateUser({
+            password: changePassword,
+            updatedBy: req.loginUser.id,
+        }, id);
         return res.json(respondSuccess());
     } catch (error) {
         return logSystemError(res, error, 'userController - update');
@@ -112,8 +131,8 @@ export async function updatePassword(req, res) {
 
 export async function deleteUser(req, res) {
     try {
-        const isDelete = await deleteUserSv(req.params.id);
-        if (!isDelete) {
+        const { id } = await findUserByPk(req.params.id);
+        if (!id) {
             return res
                 .status(ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST)
                 .json(
@@ -123,7 +142,8 @@ export async function deleteUser(req, res) {
                     ),
                 );
         }
-        return res.json(respondSuccess(isDelete));
+        await deleteUserService(id);
+        return res.json(respondSuccess());
     } catch (error) {
         return logSystemError(res, error, 'userController - deleteUser');
     }

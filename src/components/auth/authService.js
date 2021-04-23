@@ -10,8 +10,8 @@ const SECRET_ACCESS_TOKEN_EXPIRE = config.get('auth.secret_access_token_expire')
 const SECRET_REFRESH_ACCESS_TOKEN = config.get('auth.secret_refresh_access_token');
 const SECRET_REFRESH_ACCESS_TOKEN_EXPIRE = config.get('auth.secret_refresh_access_token_expire');
 
-export function isValidPassword(userpass, password) {
-    return bCrypt.compareSync(password, userpass);
+export function isValidPassword(userPassword, comparePassword) {
+    return bCrypt.compareSync(comparePassword, userPassword);
 }
 export function hashPassword(password) {
     return bCrypt.hashSync(password, bCrypt.genSaltSync(8), null);

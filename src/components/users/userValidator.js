@@ -40,7 +40,6 @@ const updateValidSchema = Joi.object().keys(userFormSchema);
 export async function createValidator(req, res, next) {
     const { body } = req;
     const result = Joi.validate(body, createValidSchema);
-    console.log(result.error);
 
     if (result.error) {
         console.log(result.error);
@@ -74,7 +73,8 @@ export async function updateValidator(req, res, next) {
 }
 
 const updatePasswordValidSchema = Joi.object().keys({
-    password: Joi.string().min(6).max(20).required(),
+    changePassword: Joi.string().min(6).max(20).required(),
+    oldPassword: Joi.string().min(6).max(20).required(),
 });
 
 export async function updatePasswordValidator(req, res, next) {

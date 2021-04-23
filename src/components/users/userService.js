@@ -1,5 +1,4 @@
 import { logger } from '../../helpers/logger';
-import { hashPassword } from '../auth/authService';
 
 const Sequelize = require('sequelize');
 
@@ -10,7 +9,6 @@ const models = require('../../models');
 const userAttributes = [
     'id',
     'email',
-    'password',
     'fullName',
     'gender',
     'birthday',
@@ -32,6 +30,7 @@ export async function getUserDetail(id) {
 export async function findUserByEmail(email) {
     try {
         return await models.User.findOne({
+            attributes: ['id'],
             where: {
                 email,
             },
@@ -41,11 +40,22 @@ export async function findUserByEmail(email) {
         throw e;
     }
 }
+export async function findUserByPk(id) {
+    try {
+        return await models.User.findByPk(id, {
+            attributes: ['id', 'password'],
+            raw: true,
+        });
+    } catch (e) {
+        logger.error(`Error in findUserByPk ${e.message}`);
+        throw e;
+    }
+}
 export async function getUsers(query) {
     try {
         const {
-            page,
-            limit,
+            page = 0,
+            limit = 10,
             keyword,
             orderBy = 'id',
             orderDirection = 'ASC',
@@ -66,7 +76,7 @@ export async function getUsers(query) {
             order,
             where,
             limit: +limit,
-            offset: page * limit,
+            offset: +page * +limit,
             raw: true,
         });
         return { users: users.rows, totalCount: users.count };
@@ -76,45 +86,22 @@ export async function getUsers(query) {
     }
 }
 
-export async function createUser({ payload, createdBy }) {
+export async function createUser(user) {
     try {
-        const {
-            fullName, birthday, phone, gender, email, password,
-        } = payload;
-        const user = await findUserByEmail(email);
-        if (user) {
-            return null;
-        }
-        return await models.User.create({
-            fullName,
-            birthday,
-            phone,
-            gender,
-            email,
-            password: hashPassword(password),
-            createdBy: createdBy.id,
-            createdAt: new Date(),
-        });
+        return await models.User.create(user);
     } catch (error) {
         logger.error(`Error in createUser ${error.message}`);
         throw error;
     }
 }
 
-export async function updateUser({ payload, idUser, updatedBy }) {
+export async function updateUser(user, id) {
     try {
-        const user = await models.User.findByPk(idUser);
-        if (!user) {
-            return null;
-        }
-        if (payload.password) {
-            payload.password = hashPassword(payload.password);
-        }
         return await models.User.update(
-            { ...payload, updatedBy: updatedBy.id },
+            user,
             {
                 where: {
-                    id: idUser,
+                    id,
                 },
             },
         );
@@ -124,12 +111,8 @@ export async function updateUser({ payload, idUser, updatedBy }) {
     }
 }
 
-export async function deleteUserSv(id) {
+export async function deleteUserService(id) {
     try {
-        const user = await models.User.findByPk(id);
-        if (!user) {
-            return null;
-        }
         return await models.User.destroy({
             where: { id },
         });
